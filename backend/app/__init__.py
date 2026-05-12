@@ -6,6 +6,7 @@ from flask_jwt_extended import JWTManager
 from flask_migrate import Migrate
 from flask_restful import Api
 
+from app.api.ai import AIStatusResource
 from app.api.analytics import AnalyticsResource
 from app.api.attendance import AttendanceResource
 from app.api.auth import LoginResource, MeResource, RegisterResource
@@ -42,6 +43,8 @@ def register_routes(app):
     api.add_resource(RegisterResource, "/auth/register")
     api.add_resource(LoginResource, "/auth/login")
     api.add_resource(MeResource, "/auth/me")
+
+    api.add_resource(AIStatusResource, "/ai/status")
 
     api.add_resource(BibleQuestionResource, "/chat/ask")
     api.add_resource(ChatHistoryResource, "/chat/history")

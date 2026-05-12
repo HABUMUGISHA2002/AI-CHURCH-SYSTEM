@@ -36,20 +36,30 @@ class AIService:
         if not self.client:
             return fallback
 
-        response = self.client.chat.completions.create(
-            model=self.model,
-            messages=[
-                {"role": "system", "content": system_prompt},
-                {"role": "user", "content": user_prompt},
-            ],
-            temperature=0.7,
-        )
-        return response.choices[0].message.content.strip()
+        try:
+            response = self.client.chat.completions.create(
+                model=self.model,
+                messages=[
+                    {"role": "system", "content": system_prompt},
+                    {"role": "user", "content": user_prompt},
+                ],
+                temperature=0.7,
+            )
+            return response.choices[0].message.content.strip()
+        except Exception:
+            return (
+                "AI request failed. Check OPENAI_API_KEY, OPENAI_MODEL, and provider billing, "
+                "then try again.\n\n"
+                f"{fallback}"
+            )
 
     def _fallback_bible_answer(self, question):
         return (
-            "AI provider is not configured yet. Once OPENAI_API_KEY is set, this question "
-            f"will receive a full pastoral response: {question}"
+            "AI provider is not configured yet. Add OPENAI_API_KEY in backend/.env or Render "
+            "environment variables to enable live pastoral responses.\n\n"
+            f"Question received: {question}\n\n"
+            "While AI is offline, consider reading the passage in context, noting repeated words, "
+            "asking what it reveals about God, and discussing sensitive matters with a trusted church leader."
         )
 
     def _fallback_sermon(self, topic, scripture, mode):

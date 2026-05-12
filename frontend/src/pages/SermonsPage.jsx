@@ -9,23 +9,39 @@ export default function SermonsPage() {
   const [generated, setGenerated] = useState("");
   const [sermons, setSermons] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [aiStatus, setAiStatus] = useState(null);
+  const [error, setError] = useState("");
 
   const loadSermons = () => api.get("/sermons").then((response) => setSermons(response.data.sermons));
 
-  useEffect(loadSermons, []);
+  useEffect(() => {
+    loadSermons();
+    api.get("/ai/status").then((response) => setAiStatus(response.data)).catch(() => setAiStatus(null));
+  }, []);
 
   const generate = async (event) => {
     event.preventDefault();
     setLoading(true);
-    const response = await api.post("/sermons/generate", form);
-    setGenerated(response.data.generated);
-    await loadSermons();
-    setLoading(false);
+    setError("");
+    try {
+      const response = await api.post("/sermons/generate", form);
+      setGenerated(response.data.generated);
+      await loadSermons();
+    } catch (err) {
+      setError(err.response?.data?.message || "Could not generate sermon content. Check the AI setup and your role.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
     <>
       <PageHeader title="AI Sermon Generator" description="Create outlines or full sermons, then save them for later editing and sharing." />
+      {aiStatus && !aiStatus.configured ? (
+        <div className="panel mb-4 border-amber-200 bg-amber-50 p-4 text-sm text-amber-800">
+          {aiStatus.message}
+        </div>
+      ) : null}
       <form className="panel grid gap-4 p-5 lg:grid-cols-2" onSubmit={generate}>
         <label className="block text-sm font-medium text-slate-700">
           Sermon topic
@@ -52,6 +68,7 @@ export default function SermonsPage() {
             {loading ? "Generating..." : "Generate"}
           </button>
         </div>
+        {error ? <p className="rounded-md bg-red-50 px-3 py-2 text-sm text-red-700 lg:col-span-2">{error}</p> : null}
       </form>
       {generated ? <pre className="panel mt-5 whitespace-pre-wrap p-5 text-sm leading-6 text-slate-700">{generated}</pre> : null}
       <div className="mt-6 grid gap-4 lg:grid-cols-2">

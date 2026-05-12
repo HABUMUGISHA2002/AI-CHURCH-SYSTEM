@@ -21,4 +21,4 @@ COPY --from=frontend-build /app/frontend/dist ./frontend/dist
 WORKDIR /app/backend
 EXPOSE 5001
 
-CMD ["sh", "-c", "gunicorn --bind 0.0.0.0:${PORT:-5001} --workers 2 --timeout 120 run:app"]
+CMD ["sh", "-c", "flask --app run.py db upgrade && gunicorn --bind 0.0.0.0:${PORT:-5001} --workers 2 --timeout 120 run:app"]

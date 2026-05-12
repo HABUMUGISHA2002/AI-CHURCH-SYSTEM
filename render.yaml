@@ -19,7 +19,9 @@ services:
           name: ai-church-system-db
           property: connectionString
       - key: FRONTEND_ORIGIN
-        sync: false
+        value: https://ai-church-system.onrender.com
+      - key: VITE_API_BASE_URL
+        value: /api
       - key: OPENAI_API_KEY
         sync: false
       - key: OPENAI_MODEL

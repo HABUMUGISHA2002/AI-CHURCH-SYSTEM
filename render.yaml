@@ -2,7 +2,7 @@ services:
   - type: web
     name: ai-church-system
     runtime: docker
-    plan: starter
+    plan: free
     autoDeploy: true
     healthCheckPath: /health
     envVars:
@@ -15,7 +15,9 @@ services:
       - key: JWT_SECRET_KEY
         generateValue: true
       - key: DATABASE_URL
-        sync: false
+        fromDatabase:
+          name: ai-church-system-db
+          property: connectionString
       - key: FRONTEND_ORIGIN
         sync: false
       - key: OPENAI_API_KEY
@@ -26,3 +28,9 @@ services:
         value: https://api.scripture.api.bible/v1
       - key: BIBLE_API_KEY
         sync: false
+
+databases:
+  - name: ai-church-system-db
+    plan: free
+    databaseName: ai_church_system
+    user: ai_church_system
